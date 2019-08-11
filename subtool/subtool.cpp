@@ -205,7 +205,6 @@ vector <srt_frame_t> Subtool::buildFrames(vector <string> lines) {
         if (getFrameTiming(lines[i], f.startTime, f.endTime) == success) {
             
             timingsIndices.push_back(i);
-            f.id = frames.size() + 1;
             frames.push_back(f);
         }
     }
@@ -288,7 +287,10 @@ srt_frame_t Subtool::getFrameFromMainFileByID(int frameID) {
     if (frameID > mainFile.size() || frameID <= 0)
         return frame;
     
-    return mainFile[frameID - 1];
+    frame = mainFile[frameID -1];
+    frame.id = frameID;
+    
+    return frame;
 }
 
 
