@@ -320,3 +320,22 @@ bool Subtool::removeFrameFromMainFileByID(int frameID) {
         
     return true;
 }
+
+
+bool Subtool::addFrameToMainFile(srt_frame_t frame) {
+
+    // the frame has no id yet, 
+    //so place it to the end oft the file
+    if (frame.id == SRT_INVALID_ID) {
+
+        frame.id = mainFile.size() + 1;
+        mainFile.push_back(frame);
+    }
+
+    else if (frame.id < 1 || frame.id > mainFile.size())
+        return false;
+    
+    mainFile.insert(mainFile.begin() + (frame.id - 1), frame);
+    
+    return true;
+}
