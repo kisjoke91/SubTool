@@ -309,3 +309,14 @@ bool Subtool::setFrameInMainFileByID(int frameID, srt_frame_t frame) {
     
     return true;
 }
+
+
+bool Subtool::removeFrameFromMainFileByID(int frameID) {
+    
+    if (frameID > mainFile.size() || frameID <= 0)
+                return false;
+        
+    mainFile.erase(mainFile.begin() + (frameID - 1));
+        
+    return true;
+}

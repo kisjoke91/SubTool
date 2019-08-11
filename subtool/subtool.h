@@ -52,8 +52,10 @@ public:
     // Manipulating and accessing operations
     void shiftTimingOfMainFile(long offset);
     bool setFrameInMainFileByID(int frameID, srt_frame_t frame);
+    bool removeFrameFromMainFileByID(int frameID);
     srt_frame_t getFrameFromMainFileByID(int frameID);
     int getMainFileFramesSize(void);
+    
     
     // Output operations
     string getOutput(void);
