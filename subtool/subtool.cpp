@@ -300,14 +300,24 @@ int Subtool::getMainFileFramesSize(void) {
 }
 
 
-bool Subtool::setFrameInMainFileByID(int frameID, srt_frame_t frame) {
+srt_frame_t Subtool::setFrameInMainFileByID(srt_frame_t frame) {
     
-    if (frameID > mainFile.size() || frameID <= 0)
-            return false;
+    if (frame.id > mainFile.size() || frameID <= 0)
+            return noSuchFrameID;
     
-    mainFile[frameID - 1] = frame;
+    if (frame.startTime == SRT_INVALID_TIMING ||
+        frame.endTime == SRT_INVALID_TIMING)
+        return invalidTimingFormat;
+
+    if (frame.startTime <= mainFile[frame.id - 2].endTime)
+        return frameStartsEarlierThanPrevioiusFrameEnds;
+
+    if (frame.endTime >= mainFile[frame.id - 1].endTime)
+        return frameEndsLaterThanNextFrameStarts;
+
+    mainFile[frame.id - 1] = frame;
     
-    return true;
+    return success;
 }
 
 
@@ -315,15 +325,16 @@ bool Subtool::removeFrameFromMainFileByID(int frameID) {
     
     if (frameID > mainFile.size() || frameID <= 0)
                 return false;
-        
+    
     mainFile.erase(mainFile.begin() + (frameID - 1));
         
     return true;
 }
 
 
-bool Subtool::addFrameToMainFile(srt_frame_t frame) {
+srt_error_t Subtool::addFrameToMainFile(srt_frame_t frame) {
 
+    
     // the frame has no id yet, 
     //so place it to the end oft the file
     if (frame.id == SRT_INVALID_ID) {
@@ -333,9 +344,19 @@ bool Subtool::addFrameToMainFile(srt_frame_t frame) {
     }
 
     else if (frame.id < 1 || frame.id > mainFile.size())
-        return false;
+        return noSuchFrameID;
     
+    if (frame.startTime == SRT_INVALID_TIMING ||
+        frame.endTime == SRT_INVALID_TIMING)
+        return invalidTimingFormat;
+
+    if (frame.startTime <= mainFile[frame.id - 1].endTime)
+        return frameStartsEarlierThanPrevioiusFrameEnds;
+
+    if (frame.endTime >= mainFile[frame.id - 1].endTime)
+        return frameEndsLaterThanNextFrameStarts;
+
     mainFile.insert(mainFile.begin() + (frame.id - 1), frame);
     
-    return true;
+    return success;
 }
