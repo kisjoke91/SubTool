@@ -88,7 +88,7 @@ int main(int argc, const char * argv[]) {
         }
         
         else {
-            cout << "The file could not be readed." << endl;
+            cout << endl << "subtool: The file could not be readed." << endl << endl;
         }
     }
     

@@ -219,7 +219,7 @@ vector <srt_frame_t> Subtool::buildFrames(vector <string> lines) {
             currentLine ++) {
             
             frames[i].content += lines[currentLine];
-            frames[i].content += "\n";
+            frames[i].content += "\r\n";
         }
         
         if (i == frames.size() - 2) {
@@ -229,7 +229,7 @@ vector <srt_frame_t> Subtool::buildFrames(vector <string> lines) {
             for (currentLine = timingsIndices[i] + 1; currentLine < lines.size(); currentLine ++) {
                 
                 frames[i].content += lines[currentLine];
-                frames[i].content += "\n";
+                frames[i].content += "\r\n";
             }
         }
         
@@ -246,13 +246,13 @@ string Subtool::renderOutput(vector <srt_frame_t> frames) {
     for (int i = 0; i < frames.size(); i ++) {
         
         str += to_string(i + 1);
-        str += "\n";
+        str += "\r\n";
         str += getTimeString(frames[i].startTime);
         str += SRT_TIMING_SEPARATOR;
         str += getTimeString(frames[i].endTime);
-        str += "\n";
+        str += "\r\n";
         str += frames[i].content;
-        str += "\n";
+        str += "\r\n";
     }
     
     return str;
