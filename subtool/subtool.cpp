@@ -280,7 +280,7 @@ void Subtool::shiftTiming(long millis, vector <srt_frame_t> & frames) {
 }
 
 
-srt_frame_t Subtool::getFrameFromMainFileByID(int frameID) {
+srt_frame_t Subtool::getFrameFromMainFile(int frameID) {
     
     srt_frame_t frame;
     
@@ -300,28 +300,39 @@ int Subtool::getMainFileFramesSize(void) {
 }
 
 
-srt_frame_t Subtool::setFrameInMainFileByID(srt_frame_t frame) {
-    
-    if (frame.id > mainFile.size() || frameID <= 0)
-            return noSuchFrameID;
-    
-    if (frame.startTime == SRT_INVALID_TIMING ||
-        frame.endTime == SRT_INVALID_TIMING)
-        return invalidTimingFormat;
+srt_error_t Subtool::setFrameInMainFile(srt_frame_t frame) {
 
-    if (frame.startTime <= mainFile[frame.id - 2].endTime)
-        return frameStartsEarlierThanPrevioiusFrameEnds;
+     srt_frame_t prev, next;
+    
+    if (frame.id == SRT_INVALID_ID)
+        return noSuchFrameID;
+    
+    if (frame.startTime >= frame.endTime)
+        return frameStartsLaterThanEnds;
 
-    if (frame.endTime >= mainFile[frame.id - 1].endTime)
+    // check if the frame exists
+    if(frame.id > mainFile.size())
+        return noSuchFrameID;
+        
+    if (mainFile.size() > frame.id)
+        next = mainFile[frame.id];
+        
+    if (mainFile.size() >= 2 && frame.id > 1)
+        prev = mainFile[frame.id - 2];
+        
+    if (next.id != SRT_INVALID_ID &&
+        next.startTime <= frame.endTime)
         return frameEndsLaterThanNextFrameStarts;
-
-    mainFile[frame.id - 1] = frame;
-    
+        
+    if (prev.id != SRT_INVALID_ID &&
+        prev.endTime >= frame.startTime)
+        return frameStartsEarlierThanPreviousFrameEnds;
+        
+    mainFile[frame.id -1] = frame;
     return success;
 }
 
-
-bool Subtool::removeFrameFromMainFileByID(int frameID) {
+bool Subtool::removeFrameFromMainFile(int frameID) {
     
     if (frameID > mainFile.size() || frameID <= 0)
                 return false;
@@ -333,30 +344,55 @@ bool Subtool::removeFrameFromMainFileByID(int frameID) {
 
 
 srt_error_t Subtool::addFrameToMainFile(srt_frame_t frame) {
-
+    
+    // Check if startTime is greater than endTime
+    if (frame.startTime >= frame.endTime)
+        return frameStartsLaterThanEnds;
     
     // the frame has no id yet, 
     //so place it to the end oft the file
     if (frame.id == SRT_INVALID_ID) {
+        
+        // There is a previous frame too
+        if (mainFile.size() > 0) {
+            
+            srt_frame_t prev;
+            prev = mainFile.back();
 
-        frame.id = mainFile.size() + 1;
+            // startTime of the new frame is less
+            if (prev.endTime >= frame.startTime)
+                return frameStartsEarlierThanPreviousFrameEnds;
+        }
+
+        // add frame at the end of the file
+        frame.id = (int) mainFile.size() + 1;
         mainFile.push_back(frame);
+        
+        return success;
     }
 
-    else if (frame.id < 1 || frame.id > mainFile.size())
+    // The frame has an id.
+    // Trying to place there
+    srt_frame_t prev, next;
+
+    // check if the frame exists
+    if(frame.id > mainFile.size())
         return noSuchFrameID;
     
-    if (frame.startTime == SRT_INVALID_TIMING ||
-        frame.endTime == SRT_INVALID_TIMING)
-        return invalidTimingFormat;
-
-    if (frame.startTime <= mainFile[frame.id - 1].endTime)
-        return frameStartsEarlierThanPrevioiusFrameEnds;
-
-    if (frame.endTime >= mainFile[frame.id - 1].endTime)
-        return frameEndsLaterThanNextFrameStarts;
-
-    mainFile.insert(mainFile.begin() + (frame.id - 1), frame);
+    if (mainFile.size() >= frame.id)
+        next = mainFile[frame.id - 1];
     
+    if (mainFile.size() >= 2 && frame.id > 1)
+        prev = mainFile[frame.id - 2];
+    
+    if (next.id != SRT_INVALID_ID &&
+        next.startTime <= frame.endTime)
+        return frameEndsLaterThanNextFrameStarts;
+    
+    if (prev.id != SRT_INVALID_ID &&
+        prev.endTime >= frame.startTime)
+        return frameStartsEarlierThanPreviousFrameEnds;
+    
+    mainFile.insert(mainFile.begin() + (frame.id - 1), frame);
     return success;
 }

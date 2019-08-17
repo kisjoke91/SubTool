@@ -40,6 +40,7 @@ enum srt_error_t {
     missingTimingSeparator,
     invalidTimingFormat,
     noSuchFrameID,
+    frameStartsLaterThanEnds,
     frameStartsEarlierThanPreviousFrameEnds,
     frameEndsLaterThanNextFrameStarts
 };
@@ -55,9 +56,9 @@ public:
     // Manipulating and accessing operations
     void shiftTimingOfMainFile(long offset);
     srt_error_t addFrameToMainFile(srt_frame_t frame);
-    srt_frame_t setFrameInMainFileByID(srt_frame_t frame);
-    bool removeFrameFromMainFileByID(int frameID);
-    srt_frame_t getFrameFromMainFileByID(int frameID);
+    srt_error_t setFrameInMainFile(srt_frame_t frame);
+    bool removeFrameFromMainFile(int frameID);
+    srt_frame_t getFrameFromMainFile(int frameID);
     int getMainFileFramesSize(void);
     
     
