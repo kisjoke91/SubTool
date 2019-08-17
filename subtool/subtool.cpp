@@ -320,11 +320,11 @@ srt_error_t Subtool::setFrameInMainFile(srt_frame_t frame) {
     if (mainFile.size() >= 2 && frame.id > 1)
         prev = mainFile[frame.id - 2];
         
-    if (next.id != SRT_INVALID_ID &&
+    if (next.startTime != SRT_INVALID_TIMING &&
         next.startTime <= frame.endTime)
         return frameEndsLaterThanNextFrameStarts;
         
-    if (prev.id != SRT_INVALID_ID &&
+    if (prev.startTime != SRT_INVALID_TIMING &&
         prev.endTime >= frame.startTime)
         return frameStartsEarlierThanPreviousFrameEnds;
         
@@ -385,11 +385,11 @@ srt_error_t Subtool::addFrameToMainFile(srt_frame_t frame) {
     if (mainFile.size() >= 2 && frame.id > 1)
         prev = mainFile[frame.id - 2];
     
-    if (next.id != SRT_INVALID_ID &&
+    if (next.startTime != SRT_INVALID_TIMING &&
         next.startTime <= frame.endTime)
         return frameEndsLaterThanNextFrameStarts;
     
-    if (prev.id != SRT_INVALID_ID &&
+    if (prev.startTime != SRT_INVALID_TIMING &&
         prev.endTime >= frame.startTime)
         return frameStartsEarlierThanPreviousFrameEnds;
     
