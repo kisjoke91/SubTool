@@ -47,19 +47,15 @@ void Subtool::getMainFileFromString(string lines) {
 
 
 void Subtool::shiftTimingOfMainFile(long offset) {
-
    shiftTiming(offset, mainFile);
 }
 
 
 void Subtool::writeOutput(string path) {
-
     writeOutputFile(path, renderOutput(mainFile));   
 }
 
-
 string Subtool::getOutput(void) {
-
     return renderOutput(mainFile);
 }
 
@@ -209,6 +205,8 @@ vector <srt_frame_t> Subtool::buildFrames(vector <string> lines) {
         }
     }
     
+    if (frames.size() < 1) return frames;
+    
     for (int i = 0; i < frames.size() - 1; i ++) {
         
         int nextTiming = timingsIndices[i + 1];
@@ -294,12 +292,6 @@ srt_frame_t Subtool::getFrameFromMainFile(int frameID) {
 }
 
 
-int Subtool::getMainFileFramesSize(void) {
-    
-    return (int) mainFile.size();
-}
-
-
 srt_error_t Subtool::setFrameInMainFile(srt_frame_t frame) {
 
      srt_frame_t prev, next;
@@ -344,7 +336,7 @@ bool Subtool::removeFrameFromMainFile(int frameID) {
 
 
 srt_error_t Subtool::addFrameToMainFile(srt_frame_t frame) {
-    
+
     // Check if startTime is greater than endTime
     if (frame.startTime >= frame.endTime)
         return frameStartsLaterThanEnds;

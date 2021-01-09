@@ -59,12 +59,13 @@ public:
     srt_error_t setFrameInMainFile(srt_frame_t frame);
     bool removeFrameFromMainFile(int frameID);
     srt_frame_t getFrameFromMainFile(int frameID);
-    int getMainFileFramesSize(void);
     
     
     // Output operations
     string getOutput(void);
     void writeOutput(string path);
+    
+    vector <srt_frame_t> mainFile;
 
 private:
     srt_error_t readFromFile(string path, vector <string> & result);
@@ -76,8 +77,6 @@ private:
     string renderOutput(vector <srt_frame_t> frames);
     void shiftTiming(long millis, vector <srt_frame_t> & frames);
     void writeOutputFile(string path, string lines);
-
-    vector <srt_frame_t> mainFile;
 };
 
 

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0903CF1C25AA21EA0094982D /* Wrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0903CF1A25AA21EA0094982D /* Wrapper.mm */; };
 		09AB0BEC22FC49970074AACE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09AB0BEB22FC49970074AACE /* main.cpp */; };
 		09AB0BF622FC4D950074AACE /* subtool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09AB0BF422FC4D950074AACE /* subtool.cpp */; };
 		09AB0BF922FC6B7C0074AACE /* ChaosCommonLibrary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09AB0BF822FC6B7C0074AACE /* ChaosCommonLibrary.cpp */; };
@@ -25,6 +26,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0903CF1A25AA21EA0094982D /* Wrapper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Wrapper.mm; sourceTree = "<group>"; };
+		0903CF1B25AA21EA0094982D /* Wrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Wrapper.h; sourceTree = "<group>"; };
 		09AB0BE822FC49970074AACE /* subtool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = subtool; sourceTree = BUILT_PRODUCTS_DIR; };
 		09AB0BEB22FC49970074AACE /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		09AB0BF422FC4D950074AACE /* subtool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = subtool.cpp; sourceTree = "<group>"; };
@@ -63,6 +66,8 @@
 		09AB0BEA22FC49970074AACE /* subtool */ = {
 			isa = PBXGroup;
 			children = (
+				0903CF1B25AA21EA0094982D /* Wrapper.h */,
+				0903CF1A25AA21EA0094982D /* Wrapper.mm */,
 				09AB0BEB22FC49970074AACE /* main.cpp */,
 				09AB0BF422FC4D950074AACE /* subtool.cpp */,
 				09AB0BF522FC4D950074AACE /* subtool.h */,
@@ -132,6 +137,7 @@
 				09AB0BF922FC6B7C0074AACE /* ChaosCommonLibrary.cpp in Sources */,
 				09AB0BF622FC4D950074AACE /* subtool.cpp in Sources */,
 				09AB0BEC22FC49970074AACE /* main.cpp in Sources */,
+				0903CF1C25AA21EA0094982D /* Wrapper.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
