@@ -203,6 +203,11 @@ vector <srt_frame_t> Subtool::buildFrames(vector <string> lines) {
             timingsIndices.push_back(i);
             frames.push_back(f);
         }
+        
+        string str = lines[i];
+        str.erase(std::remove(str.begin(), str.end(), '\r'), str.end());
+        str.erase(std::remove(str.begin(), str.end(), '\n'), str.end());
+        lines[i] = str;
     }
     
     if (frames.size() < 1) return frames;
@@ -215,9 +220,12 @@ vector <srt_frame_t> Subtool::buildFrames(vector <string> lines) {
             currentLine < nextTiming &&
             !std::all_of(lines[currentLine].begin(), lines[currentLine].end(), ::isdigit);
             currentLine ++) {
-            
+                        
             frames[i].content += lines[currentLine];
-            frames[i].content += "\r\n";
+            if (lines.size() > currentLine + 1) {
+                if (lines[currentLine + 1] != "")
+                    frames[i].content += "\r\n";
+            }
         }
         
         if (i == frames.size() - 2) {
@@ -227,12 +235,11 @@ vector <srt_frame_t> Subtool::buildFrames(vector <string> lines) {
             for (currentLine = timingsIndices[i] + 1; currentLine < lines.size(); currentLine ++) {
                 
                 frames[i].content += lines[currentLine];
-                frames[i].content += "\r\n";
             }
         }
         
     }
-    
+    printf("s");
     return frames;
 }
 
@@ -250,7 +257,7 @@ string Subtool::renderOutput(vector <srt_frame_t> frames) {
         str += getTimeString(frames[i].endTime);
         str += "\r\n";
         str += frames[i].content;
-        str += "\r\n";
+        str += "\r\n\r\n";
     }
     
     return str;
@@ -336,55 +343,82 @@ bool Subtool::removeFrameFromMainFile(int frameID) {
 
 
 srt_error_t Subtool::addFrameToMainFile(srt_frame_t frame) {
+    
+    srt_frame_t prev, next;
+    srt_error_t e = unspecified;
 
     // Check if startTime is greater than endTime
     if (frame.startTime >= frame.endTime)
         return frameStartsLaterThanEnds;
     
-    // the frame has no id yet, 
-    //so place it to the end oft the file
-    if (frame.id == SRT_INVALID_ID) {
+    prev = getFrameBefore(frame.startTime);
+    next = getFrameAfter(frame.endTime);
+    
+    
+    // insert
+    if (prev.id != SRT_INVALID_ID &&
+        next.id != SRT_INVALID_ID &&
+        mainFile.size() != 0 &&
+        next.id - prev.id == 1) {
         
-        // There is a previous frame too
-        if (mainFile.size() > 0) {
-            
-            srt_frame_t prev;
-            prev = mainFile.back();
-
-            // startTime of the new frame is less
-            if (prev.endTime >= frame.startTime)
-                return frameStartsEarlierThanPreviousFrameEnds;
-        }
-
-        // add frame at the end of the file
-        frame.id = (int) mainFile.size() + 1;
-        mainFile.push_back(frame);
-        
-        return success;
+        mainFile.insert(mainFile.begin() + (next.id - 1), frame);
     }
+    
+    // insert before
+    else if (prev.id == SRT_INVALID_ID &&
+             next.id == 1 &&
+             frame.endTime < next.startTime) {
+        
+        mainFile.insert(mainFile.begin() + 0, frame);
+    }
+    
+    // append
+    else if (prev.id != SRT_INVALID_ID &&
+             next.id == SRT_INVALID_ID &&
+             mainFile.size() == prev.id &&
+             frame.startTime > prev.endTime) {
+        
+        mainFile.push_back(frame);
+    }
+    
+    // first
+    else if (prev.id == SRT_INVALID_ID &&
+        next.id == SRT_INVALID_ID &&
+             mainFile.size() == 0) {
+        
+        mainFile.push_back(frame);
+    }
+    
+    return e;
+}
 
-    // The frame has an id.
-    // Trying to place there
-    srt_frame_t prev, next;
+srt_frame_t Subtool::getFrameBefore(long time) {
+    
+    srt_frame_t f;
+    
+    for (int i = 0; i < mainFile.size(); i ++) {
+        
+        if (mainFile[i].endTime < time) {
+            f = mainFile[i];
+            f.id = i + 1;
+        }
+    }
+    
+    return f;
+}
 
-    // check if the frame exists
-    if(frame.id > mainFile.size())
-        return noSuchFrameID;
+srt_frame_t Subtool::getFrameAfter(long time) {
     
-    if (mainFile.size() >= frame.id)
-        next = mainFile[frame.id - 1];
+    srt_frame_t f;
     
-    if (mainFile.size() >= 2 && frame.id > 1)
-        prev = mainFile[frame.id - 2];
+    for (int i = 0; i < mainFile.size(); i ++) {
+        
+        if (mainFile[i].startTime > time) {
+            f = mainFile[i];
+            f.id = i + 1;
+            break;
+        }
+    }
     
-    if (next.startTime != SRT_INVALID_TIMING &&
-        next.startTime <= frame.endTime)
-        return frameEndsLaterThanNextFrameStarts;
-    
-    if (prev.startTime != SRT_INVALID_TIMING &&
-        prev.endTime >= frame.startTime)
-        return frameStartsEarlierThanPreviousFrameEnds;
-    
-    mainFile.insert(mainFile.begin() + (frame.id - 1), frame);
-    return success;
+    return f;
 }

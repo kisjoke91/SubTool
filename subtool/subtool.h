@@ -77,6 +77,8 @@ private:
     string renderOutput(vector <srt_frame_t> frames);
     void shiftTiming(long millis, vector <srt_frame_t> & frames);
     void writeOutputFile(string path, string lines);
+    srt_frame_t getFrameBefore(long time);
+    srt_frame_t getFrameAfter(long time);
 };
 
 

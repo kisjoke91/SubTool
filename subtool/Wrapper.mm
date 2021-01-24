@@ -9,8 +9,11 @@
 #import "subtool.h"
 
 
+
+
 @implementation SRTFrame
 @end
+
 
 @implementation SubTool {
     Subtool t;
@@ -25,7 +28,7 @@
 }
 
 - (NSString *) getOutput {
-    return [NSString stringWithCString:self->t.getOutput().c_str() encoding:[NSString defaultCStringEncoding]];
+    return [NSString stringWithUTF8String:self->t.getOutput().c_str()];
 }
 
 - (SRTFrame *) getFrame: (int) frameID {
@@ -39,10 +42,10 @@
         return nil;
     }
     
-    f->frameid = n.id;
-    f->startTime = n.startTime;
-    f->endTime = n.endTime;
-    f->content = [NSString stringWithCString:n.content.c_str() encoding:[NSString defaultCStringEncoding]];
+    f.frameid = n.id;
+    f.startTime = n.startTime;
+    f.endTime = n.endTime;
+    f.content = [NSString stringWithUTF8String:n.content.c_str()];
     
     return f;
 }
@@ -51,10 +54,10 @@
     
     srt_frame_t f;
     
-    f.id = frame->frameid;
-    f.startTime = frame->startTime;
-    f.endTime = frame->endTime;
-    f.content = [frame->content cStringUsingEncoding:NSUTF8StringEncoding];
+    f.id = frame.frameid;
+    f.startTime = frame.startTime;
+    f.endTime = frame.endTime;
+    f.content = [frame.content cStringUsingEncoding:NSUTF8StringEncoding];
     
     return (SRTError) self->t.addFrameToMainFile(f);
 }
@@ -63,10 +66,10 @@
     
     srt_frame_t f;
     
-    f.id = frame->frameid;
-    f.startTime = frame->startTime;
-    f.endTime = frame->endTime;
-    f.content = [frame->content cStringUsingEncoding:NSUTF8StringEncoding];
+    f.id = frame.frameid;
+    f.startTime = frame.startTime;
+    f.endTime = frame.endTime;
+    f.content = [frame.content cStringUsingEncoding:NSUTF8StringEncoding];
     
     return (SRTError) self->t.setFrameInMainFile(f);
 }
@@ -75,20 +78,24 @@
     return self->t.removeFrameFromMainFile(frameID);
 }
 
-- (NSArray <SRTFrame *> *) frames {
+- (NSArray <SRTFrame *> *) getFrames {
     
     NSMutableArray * a = [NSMutableArray new];
 
+    int i = 1;
+    
     for(auto n: self->t.mainFile) {
         
         SRTFrame * f = [SRTFrame new];
         
-        f->frameid = n.id;
-        f->startTime = n.startTime;
-        f->endTime = n.endTime;
-        f->content = [NSString stringWithCString:n.content.c_str() encoding:[NSString defaultCStringEncoding]];
+        f.frameid = i;
+        f.startTime = n.startTime;
+        f.endTime = n.endTime;
+        f.content = [NSString stringWithUTF8String:n.content.c_str()];
         
         [a addObject: f];
+        
+        i ++;
     }
 
     return a;
